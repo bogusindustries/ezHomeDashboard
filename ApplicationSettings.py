@@ -10,7 +10,7 @@ import requests
 import json
 import re
 
-import WeatherAPIRequest_v01 as weather
+import WeatherAPIRequest as weather
 
 # handle character encoding
 sys.stdout.reconfigure(encoding="utf-8")
