@@ -6,9 +6,9 @@ from PyQt5 import QtWidgets
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt
 
-import eventWidgets_05 as eventWidgets
-import clock_v02 as clock
-import ApplicationSettings_v02 as settings
+import EventWidgets as eventWidgets
+import EZClock as clock
+import ApplicationSettings as settings
 
 
 class EZHomeDashboard(QtWidgets.QMainWindow):
