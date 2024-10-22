@@ -1,6 +1,6 @@
-#import datetime
+# places next 15 events into lists of today or future
+
 from datetime import datetime, timezone
-#from zoneinfo import ZoneInfo
 from tzlocal import get_localzone
 
 import os.path
@@ -11,94 +11,95 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
-# If modifying these scopes, delete the file token.json.
-SCOPES = ["https://www.googleapis.com/auth/calendar.readonly"]
-
-
-def main():
-  """Shows basic usage of the Google Calendar API.
-  Prints the start and name of the next 10 events on the user's calendar.
-  """
-  creds = None
-  # The file token.json stores the user's access and refresh tokens, and is
-  # created automatically when the authorization flow completes for the first
-  # time.
-  if os.path.exists("token.json"):
-    creds = Credentials.from_authorized_user_file("token.json", SCOPES)
-  # If there are no (valid) credentials available, let the user log in.
-  if not creds or not creds.valid:
-    if creds and creds.expired and creds.refresh_token:
-      creds.refresh(Request())
-    else:
-      flow = InstalledAppFlow.from_client_secrets_file(
-          "credentials.json", SCOPES
-      )
-      creds = flow.run_local_server(port=0)
-    # Save the credentials for the next run
-    with open("token.json", "w") as token:
-      token.write(creds.to_json())
-
-  try:
-    service = build("calendar", "v3", credentials=creds)
-
-    # Call the Calendar API
-    now = datetime.now(timezone.utc)
-    rfc3339_timestamp = now.isoformat()
-
-    events_result = (
-        service.events()
-        .list(
-            calendarId="primary",
-            timeMin=rfc3339_timestamp,
-            maxResults=10,
-            singleEvents=True,
-            orderBy="startTime",
+class GoogleCalenderAPI:
+  def __init__(self):
+    self.todayEvents = []
+    self.futureEvents = []
+    self.scopes = ["https://www.googleapis.com/auth/calendar.readonly"]
+    self.creds = None
+    # The file token.json stores the user's access and refresh tokens, and is
+    # created automatically when the authorization flow completes for the first
+    # time.
+    if os.path.exists("token.json"):
+      self.creds = Credentials.from_authorized_user_file("token.json", self.scopes)
+    # If there are no (valid) credentials available, let the user log in.
+    if not self.creds or not self.creds.valid:
+      if self.creds and self.creds.expired and self.creds.refresh_token:
+        self.creds.refresh(Request())
+      else:
+        flow = InstalledAppFlow.from_client_secrets_file(
+            "credentials.json", self.scopes
         )
-        .execute()
-    )
-    events = events_result.get("items", [])
+        self.creds = flow.run_local_server(port=0)
+      # Save the credentials for the next run
+      with open("token.json", "w") as token:
+        token.write(self.creds.to_json())
 
-    if not events:
-      print("No upcoming events found.")
-      return
+    try:
+      service = build("calendar", "v3", credentials=self.creds)
 
-    # Prints the start and name of the next 10 events
-    #local_tz = ZoneInfo('America/Chicago')  # Change to your local timezone
+      # Call the Calendar API
+      now = datetime.now(timezone.utc)
+      rfc3339_timestamp = now.isoformat()
 
-    # Get the local time zone
-    local_tz = get_localzone()
+      events_result = (
+          service.events()
+          .list(
+              calendarId="primary",
+              timeMin=rfc3339_timestamp,
+              maxResults=15,
+              singleEvents=True,
+              orderBy="startTime",
+          )
+          .execute()
+      )
+      events = events_result.get("items", [])
 
-    for event in events:
-        summary = event.get('summary', 'No summary available')
-        date = event['start'].get('date')
-        startTime = event['start'].get('dateTime')
-        location = event.get('location', 'No location specified')
+      if not events:
+        print("No upcoming events found.")
+        return
 
-        if startTime:
-            try:
-                # Parse the startTime as a naive datetime and assume it's in UTC
-                event_time_utc = datetime.fromisoformat(startTime)
-                # Convert to local time
-                local_time = event_time_utc.astimezone(local_tz)
-                formattedTime = local_time.strftime("%I:%M %p")
-                #formattedDate = local_time.strftime("%Y-%m-%d")
-                formattedDate = local_time.strftime("%m %d, %Y")
-            except ValueError as e:
-                print(f"Error parsing time: {e}")
-                formattedTime = "none"
-                formattedDate = "none"
-        else:
-            print("Start time is not available.")
-            formattedTime = "none"
-            formattedDate = "none"
+      # Get the local time zone
+      local_tz = get_localzone()
 
-        # Print the event details
-        print(f"{summary}\n{date}\nLocation: {location}\nTime: {formattedTime}\ndate : {formattedDate}\n")
+      for event in events:
+          summary = event.get('summary', 'No summary available')
+          date = event['start'].get('date')#recurring events
+          startTime = event['start'].get('dateTime')#one time events
+          location = event.get('location', 'No location specified')
+          print(f"{summary}\n")
+          if date:
+            if date == now.date():
+              self.todayEvents.append(event)
+            else:
+              self.futureEvents.append(event)
+              
+          if startTime:
+              try:
+                  # Parse the startTime as a naive datetime and assume it's in UTC
+                  event_time_utc = datetime.fromisoformat(startTime)
+                  # Convert to local time
+                  local_time = event_time_utc.astimezone(local_tz)
+                  formattedTime = local_time.strftime("%I:%M %p")
+                  formattedDate = local_time.strftime("%Y-%m-%d")
+                  if formattedDate == now.date():
+                     self.todayEvents.append(event)
+                  else:
+                     self.futureEvents.append(event)
+              except ValueError as e:
+                  print(f"Error parsing time: {e}")
+                  formattedTime = "none"
+                  formattedDate = "none"
+          else:
+              formattedTime = "none"
+              formattedDate = "none"
+
+          
+
+    except HttpError as error:
+      print(f"An error occurred: {error}")
 
 
-  except HttpError as error:
-    print(f"An error occurred: {error}")
-
-
-if __name__ == "__main__":
-  main()
+# calender = GoogleCalenderAPI()
+# print(calender.todayEvents)
+# print(calender.futureEvents)
