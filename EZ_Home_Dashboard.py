@@ -9,7 +9,7 @@ from PyQt5.QtCore import Qt
 import EventWidgets as eventWidgets
 import EZClock as clock
 import ApplicationSettings as settings
-
+import GoogleCalendarAPI as calendar
 
 class EZHomeDashboard(QtWidgets.QMainWindow):
     def __init__(self):
@@ -24,6 +24,8 @@ class EZHomeDashboard(QtWidgets.QMainWindow):
         self.clock = clock.Clock()
         self.weatherSettingsWindow = settings.WeatherSettingsWindow(self)
         self.weather = self.weatherSettingsWindow.weatherRequester
+        self.calendar = calendar.GoogleCalenderAPI()
+        
 
         self.createMenus()
         self.createPalettes()
@@ -223,6 +225,11 @@ class EZHomeDashboard(QtWidgets.QMainWindow):
         self.futureEvent8 = eventWidgets.HorizontalEventWidget()
         self.futureEvent9 = eventWidgets.HorizontalEventWidget()
         self.futureEvent10 = eventWidgets.HorizontalEventWidget()
+
+        # eventually create future event horizontal widgets based on number
+        # of calendar futureEvents
+        # print(len(self.calendar.futureEvents))
+
         
         self.todayEventsLayout = QtWidgets.QHBoxLayout()
         self.todayEventsLayout.setContentsMargins(0, 0, 0, 0)

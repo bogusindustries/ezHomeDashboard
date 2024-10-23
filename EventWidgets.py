@@ -51,10 +51,12 @@ class VerticalEventWidget(QtWidgets.QWidget):
         self.setLayout(mainLayout)
 
 class HorizontalEventWidget(QtWidgets.QWidget):
-    def __init__(self, summary = "eventSummary", start = "HH:MM", rgb=[0, 0, 0]):
+    def __init__(self, summary = "eventSummary", start = "HH:MM", date = "MM:DD:YY", location = "Location", rgb=[0, 0, 0]):
         super().__init__()
         self.summary = summary
         self.start = start
+        self.date = date
+        self.location = location
         self.r, self.g, self.b = rgb
 
         self.createWidgets()
