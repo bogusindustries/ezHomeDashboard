@@ -212,12 +212,6 @@ class EZHomeDashboard(QtWidgets.QMainWindow):
         self.todayEventsLayout.setContentsMargins(0, 0, 0, 0)
         self.todayEventsLayout.setSpacing(0)
 
-        #self.todayEvent1 = eventWidgets.VerticalEventWidget(rgb=[23,134,234])
-        # self.todayEvent1 = eventWidgets.VerticalEventWidget()
-        # self.todayEvent2 = eventWidgets.VerticalEventWidget()
-        # self.todayEvent3 = eventWidgets.VerticalEventWidget()
-        # self.todayEvent4 = eventWidgets.VerticalEventWidget()
-        # self.todayEvent5 = eventWidgets.VerticalEventWidget()
         for each in self.calendar.todayEvents:
             event = eventWidgets.VerticalEventWidget(each["summary"], each["time"], each["date"], each["location"])
             self.todayEventsLayout.addWidget(event)
@@ -229,33 +223,8 @@ class EZHomeDashboard(QtWidgets.QMainWindow):
         self.futureEventsLayout.setSpacing(0)
 
         for each in self.calendar.futureEvents:
-            #print(each["summary"])
             event = eventWidgets.HorizontalEventWidget(each["summary"], each["time"], each["date"], each["location"])
             self.futureEventsLayout.addWidget(event)
-        # self.futureEvent1 = eventWidgets.HorizontalEventWidget()
-        # self.futureEvent2 = eventWidgets.HorizontalEventWidget()
-        # self.futureEvent3 = eventWidgets.HorizontalEventWidget()
-        # self.futureEvent4 = eventWidgets.HorizontalEventWidget()
-        # self.futureEvent5 = eventWidgets.HorizontalEventWidget()
-        # self.futureEvent6 = eventWidgets.HorizontalEventWidget()
-        # self.futureEvent7 = eventWidgets.HorizontalEventWidget()
-        # self.futureEvent8 = eventWidgets.HorizontalEventWidget()
-        # self.futureEvent9 = eventWidgets.HorizontalEventWidget()
-        # self.futureEvent10 = eventWidgets.HorizontalEventWidget()
-
-        # eventually create future event horizontal widgets based on number
-        # of calendar futureEvents
-        # print(len(self.calendar.futureEvents))
-
-        
-        # self.todayEventsLayout = QtWidgets.QHBoxLayout()
-        # self.todayEventsLayout.setContentsMargins(0, 0, 0, 0)
-        # self.todayEventsLayout.setSpacing(0)
-        # self.todayEventsLayout.addWidget(self.todayEvent1)
-        # self.todayEventsLayout.addWidget(self.todayEvent2)
-        # self.todayEventsLayout.addWidget(self.todayEvent3)
-        # self.todayEventsLayout.addWidget(self.todayEvent4)
-        # self.todayEventsLayout.addWidget(self.todayEvent5)
 
         # Holds today schedule title and events
         self.todayScheduleLayout = QtWidgets.QVBoxLayout()
@@ -263,20 +232,6 @@ class EZHomeDashboard(QtWidgets.QMainWindow):
         self.todayScheduleLayout.setSpacing(10)
         self.todayScheduleLayout.addWidget(self.todayScheduleLabel)
         self.todayScheduleLayout.addLayout(self.todayEventsLayout)
-
-        # self.futureEventsLayout = QtWidgets.QVBoxLayout()
-        # self.futureEventsLayout.setContentsMargins(0,0,0,0)
-        # self.futureEventsLayout.setSpacing(0)
-        # self.futureEventsLayout.addWidget(self.futureEvent1)
-        # self.futureEventsLayout.addWidget(self.futureEvent2)
-        # self.futureEventsLayout.addWidget(self.futureEvent3)
-        # self.futureEventsLayout.addWidget(self.futureEvent4)
-        # self.futureEventsLayout.addWidget(self.futureEvent5)
-        # self.futureEventsLayout.addWidget(self.futureEvent6)
-        # self.futureEventsLayout.addWidget(self.futureEvent7)
-        # self.futureEventsLayout.addWidget(self.futureEvent8)
-        # self.futureEventsLayout.addWidget(self.futureEvent9)
-        # self.futureEventsLayout.addWidget(self.futureEvent10)
 
         # Holds future schedule title and events
         self.futureScheduleLayout = QtWidgets.QVBoxLayout()
@@ -286,8 +241,7 @@ class EZHomeDashboard(QtWidgets.QMainWindow):
         self.allScheduleLayout = QtWidgets.QHBoxLayout()
         self.allScheduleLayout.addLayout(self.todayScheduleLayout)
         self.allScheduleLayout.addLayout(self.futureScheduleLayout)
-
-        
+ 
         self.scheduleArea.setLayout(self.allScheduleLayout)
 
     def createBottomsection(self):
