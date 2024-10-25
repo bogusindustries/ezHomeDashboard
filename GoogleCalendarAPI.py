@@ -50,7 +50,7 @@ class GoogleCalenderAPI:
                 .list(
                     calendarId="primary",
                     timeMin=rfc3339_timestamp,
-                    maxResults=15,
+                    maxResults=8,
                     singleEvents=True,
                     orderBy="startTime",
                 )
