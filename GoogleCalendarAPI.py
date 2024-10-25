@@ -2,6 +2,7 @@
 
 from datetime import datetime, timezone
 from tzlocal import get_localzone
+import pytz
 
 import os.path
 
@@ -15,6 +16,9 @@ class GoogleCalenderAPI:
     def __init__(self):
         self.todayEvents = []
         self.futureEvents = []
+        self.localTimezone = get_localzone()
+        godDamnTimeZone = pytz.timezone(self.localTimezone)
+        self.todaysFuckingDate = datetime.now(godDamnTimeZone)
         self.scopes = ["https://www.googleapis.com/auth/calendar.readonly"]
         self.creds = None
         # The file token.json stores the user's access and refresh tokens, and is
@@ -60,7 +64,7 @@ class GoogleCalenderAPI:
                 return
 
         # Get the local time zone
-            local_tz = get_localzone()
+            #self.local_tz = get_localzone()
 
             for event in events:
                 summary = event.get('summary', 'No summary available')
@@ -114,20 +118,61 @@ class GoogleCalenderAPI:
         except HttpError as error:
             print(f"An error occurred: {error}")
 
+        #seriously what fucking day is it here?
+        
+        print(f"Todays fucking date : {self.todaysFuckingDate}")
+        print(f"Time Zone: {self.localTimezone}")
+        print(f"Today now is : {self.now.date()}")
+        print(f"Today's events: {self.todayEvents}")
+        print(f"Future Events: {self.futureEvents}")
+
     def processDateTime(self, summary, dateTime, location):
-        print(f"Summary: {summary}")
-        print(f"DateTime: {dateTime}")
-        print(f"location: {location}")
+        event_time_utc = datetime.fromisoformat(dateTime)
+        local_time = event_time_utc.astimezone(self.localTimezone)
+        formattedTime = local_time.strftime("%I:%M %p")
+        formattedDate = local_time.strftime("%m-%d-%Y")
+        checkDate = local_time.strftime("%Y-%m-%d")
+        #print(f"Summary: {summary}")
+        #print(f"Date: {formattedDate}")
+        #print(f"DateTime: {dateTime}")
+        #print(f"Time: {formattedTime}")
+        #print(f"location: {location}\n")
+        print(f"event check date is : {checkDate}")
+        tempDict = {
+            "summary" : summary,
+            "date" : formattedDate,
+            "time" : formattedTime,
+            "location" : location
+        }
+        #if checkDate == self.now.date():
+        if checkDate == self.todaysFuckingDate:
+            self.todayEvents.append(tempDict)
+        else:
+            self.futureEvents.append(tempDict)
+
 
     def processDate(self, summary, date, location):
-        print(f"Summary: {summary}")
-        print(f"Date is : {date}")
-        print("Time: All Day")
-        print(f"Location: {location}")
+        #print(f"Summary: {summary}")
+        #print(f"Date is : {date}")
+        #print("Time: All Day")
+        #print(f"Location: {location}\n")
         # if date == self.now.date():
         #     print("event is today")
         # else:
         #     print("event is not today")
+
+        tempDict = {
+            "summary" : summary,
+            "date" : date,
+            "time" : "All Day",
+            "location" : location
+        }
+
+        #if date == self.now.date():
+        if date == self.todaysFuckingDate:
+            self.todayEvents.append(tempDict)
+        else:
+            self.futureEvents.append(tempDict)
 
 
 
