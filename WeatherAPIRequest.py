@@ -35,6 +35,7 @@ class WeatherAPIRequest:
             print("No ID saved")
 
     def requestWeather(self):
+        print("WeatherAPI Requesting Weather")
         if not self.Test:
             self.URL = "https://api.openweathermap.org/data/3.0/onecall?lat={}&lon={}&units=imperial&appid={}".format(self.lat, self.lon, self.appID)
             self.request = requests.get(self.URL).json()

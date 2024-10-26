@@ -5,7 +5,7 @@ import sys
 import os
 from PyQt5 import QtWidgets
 from PyQt5 import QtGui
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QTimer
 import requests
 import json
 import re
@@ -27,7 +27,7 @@ class WeatherSettingsWindow(QtWidgets.QMainWindow):
         self.geoLocation = GeoLocation()
         self.weatherRequester = weather.WeatherAPIRequest()
         self.searchByCity = None
-        #self.weatherRequester = None
+        self.weatherTimer = QTimer(self)
         self.createWidgets()
         self.createLayouts()
         self.connectUI()
@@ -106,7 +106,9 @@ class WeatherSettingsWindow(QtWidgets.QMainWindow):
         self.locationInput.textChanged.connect(lambda: self.validate_input())
         self.locationSearchButton.clicked.connect(lambda: self.submitLocation())#self.searchByCity
     
+    # Sets self.seachByCity using isZipCode and isCityName methods.
     def validate_input(self):
+        #get input of search field
         text = self.locationInput.text().strip()
         
         if self.isZipCode(text):
@@ -122,13 +124,15 @@ class WeatherSettingsWindow(QtWidgets.QMainWindow):
             self.searchByCity = None
 
     def isZipCode(self, text):
-        return bool(re.match(r'^\d{5}(-\d{4})?$', text))  # Matches 5-digit ZIP code and optional 4-digit extension
+        # returns a True boolean if input matches 5-digit ZIP code and optional 4-digit extension
+        return bool(re.match(r'^\d{5}(-\d{4})?$', text))  
 
     def isCityName(self, text):
         # Here you can define a list of valid city names or a regex for validation
         # For simplicity, let's just check if it contains only letters and spaces
         return bool(re.match(r'^[A-Za-z\s]+$', text))
 
+    # Sends input from self.appIDInput for verification in geoLocation - same ID for weather
     def submitAppID(self):
         self.appIDString = self.appIDInput.text()
         if not self.appIDString:
@@ -136,7 +140,8 @@ class WeatherSettingsWindow(QtWidgets.QMainWindow):
 
         self.geoLocation.setAppID(self.appIDInput.text())
     
-    def submitLocation(self):#byCity
+    # Send Search input to geoLocation and build a list of buttons based on the result
+    def submitLocation(self):
         if self.searchByCity:
             self.geoLocation.byCity(self.locationInput.text())
             self.createLocationChoiceMenu(self.geoLocation.buttonNames)
@@ -147,8 +152,9 @@ class WeatherSettingsWindow(QtWidgets.QMainWindow):
             self.locationInput.setText("Invalid Search")
         #self.createLocationChoiceMenu(self.geoLocation.buttonNames)
 
+    # Creates a list of buttons and connects the to the setLocation method
     def createLocationChoiceMenu(self, incomingList):
-        incomingList = self.geoLocation.buttonNames
+        #incomingList = self.geoLocation.buttonNames
         
         for button, text in zip(self.locationChoiceButtonList, incomingList):
             button.setText(text)
@@ -168,12 +174,28 @@ class WeatherSettingsWindow(QtWidgets.QMainWindow):
             # For ZIP code searches, where the request is a single dictionary
             locationChoice = self.geoLocation.request
         
+        # Set the necessary variables needed to build the weather request URL
         self.weatherRequester.city = locationChoice.get("name", "Unknown")
         self.weatherRequester.lat = locationChoice.get("lat")
         self.weatherRequester.lon = locationChoice.get("lon")
         self.weatherRequester.requestWeather()
         self.dashboard.updateUI()
-        
+        #begin timer here that will run weather requests every n minutes
+        self.startWeatherTimer()
+
+    def startWeatherTimer(self):
+        self.weatherTimer.setInterval(900000)#15 minutes = 900000
+        self.weatherTimer.timeout.connect(self.onQuarterHour)
+        self.weatherTimer.start()
+
+    def onQuarterHour(self):
+        self.takeWeatherReading()
+        self.weatherTimer.start()
+
+    def takeWeatherReading(self):
+        self.weatherRequester.requestWeather()
+        self.dashboard.updateUI()
+        print("weather requested from application settings")
 
 # Window for setting location
 class SetLocationWindow(QtWidgets.QMainWindow):
@@ -198,10 +220,12 @@ class GeoLocation:
         self.URL = None
         self.request = None
 
+    # saves API key to local drive does not verify it's a valid key
     def setAppID(self, string):
-        print("GeoLocation Class")
+        #print("GeoLocation Class")
         self.appID=string
-        print(self.appID)
+        #print(self.appID)
+
         writeFile = SaveID()
         writeFile.savePassword(self.appID)
 
@@ -216,7 +240,7 @@ class GeoLocation:
         ]
         
         self.buttonNames = formattedLocations
-        print(self.request)
+        #print(self.request)
 
     def byZipcode(self, zip):
         self.zip = zip
@@ -228,7 +252,7 @@ class GeoLocation:
 
         # Ensure this is a list, not a set
         self.buttonNames = [formattedLocation]
-        print(self.request)
+        #print(self.request)
 
     def checkExistingID(self):
         macFilePath = "/Users/johnzilka/Documents/JZ/Documents/EZHomeDashboardWeatherID.json"
@@ -245,7 +269,7 @@ class GeoLocation:
 
 class SaveID:
     def __init__(self):
-        print("Save ID initialized")
+        #print("Save ID initialized")
         self.data = {}
 
     def savePassword(self, appID):
@@ -254,6 +278,5 @@ class SaveID:
         }
 
         macFilePath = "/Users/johnzilka/Documents/JZ/Documents/EZHomeDashboardWeatherID.json"
-        #/Users/johnzilka/Documents/JZ/Documents
         with open(macFilePath, "w") as file:
             json.dump(self.data, file)

@@ -212,10 +212,14 @@ class EZHomeDashboard(QtWidgets.QMainWindow):
         self.todayEventsLayout.setContentsMargins(0, 0, 0, 0)
         self.todayEventsLayout.setSpacing(0)
 
-        for each in self.calendar.todayEvents:
-            event = eventWidgets.VerticalEventWidget(each["summary"], each["time"], each["date"], each["location"])
+        if self.calendar.todayEvents:
+            for each in self.calendar.todayEvents:
+                event = eventWidgets.VerticalEventWidget(each["summary"], each["time"], each["date"], each["location"])
+                self.todayEventsLayout.addWidget(event)
+        else:
+            event = eventWidgets.EmptyVerticalEventWidget()
             self.todayEventsLayout.addWidget(event)
-        
+
         self.futureScheduleLabel = QtWidgets.QLabel("Upcoming Events")
         
         self.futureEventsLayout = QtWidgets.QVBoxLayout()

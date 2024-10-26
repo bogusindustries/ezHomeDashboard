@@ -46,7 +46,7 @@ class VerticalEventWidget(QtWidgets.QWidget):
 
         # Set the main layout for the parent widget
         mainLayout = QtWidgets.QVBoxLayout(self)
-        mainLayout.setContentsMargins(5, 30, 5, 5) #argin around outside of each event
+        mainLayout.setContentsMargins(5, 30, 5, 5) #margin around outside of each event
         mainLayout.setSpacing(50)
         mainLayout.addWidget(self.eventArea)
         self.setLayout(mainLayout)
@@ -94,6 +94,47 @@ class HorizontalEventWidget(QtWidgets.QWidget):
 
         # Set the main layout for the parent widget
         mainLayout = QtWidgets.QVBoxLayout(self)
+        mainLayout.setContentsMargins(0, 0, 0, 0)
         mainLayout.setSpacing(4)
+        mainLayout.addWidget(self.eventArea)
+        self.setLayout(mainLayout)
+
+class EmptyVerticalEventWidget(QtWidgets.QWidget):
+    def __init__(self, message="No Events Today!", rgb=[0, 0, 0]):
+        super().__init__()
+        self.message = message
+        self.r, self.g, self.b = rgb
+
+        self.createWidgets()
+        self.createLayouts()
+
+    def createWidgets(self):
+        # Create a container for labels
+        self.eventArea = QtWidgets.QWidget()
+        self.eventArea.setAutoFillBackground(True)
+        self.eventArea.setFixedHeight(100)
+        self.eventArea.setFixedWidth(600)
+        self.eventArea.setStyleSheet(
+            "QWidget{"
+            f"background-color: rgba({self.r}, {self.g}, {self.b}, 1.0);"  # Use a solid background if needed
+            "border: 2px solid transparent;"
+            "border-radius: 15px;}"
+        )
+
+        self.messageLabel = QtWidgets.QLabel(self.message)
+        self.messageLabel.setAlignment(QtCore.Qt.AlignCenter)
+
+    def createLayouts(self):
+        self.eventLayout = QtWidgets.QVBoxLayout()
+        self.eventLayout.setContentsMargins(10, 10, 10, 10)  # Adjust margins if necessary
+        self.eventLayout.setSpacing(0)
+        self.eventLayout.addWidget(self.messageLabel)
+
+        self.eventArea.setLayout(self.eventLayout)
+
+        # Set the main layout for the parent widget
+        mainLayout = QtWidgets.QVBoxLayout(self)
+        mainLayout.setContentsMargins(5, 30, 5, 5) #margin around outside of each event
+        mainLayout.setSpacing(50)
         mainLayout.addWidget(self.eventArea)
         self.setLayout(mainLayout)
