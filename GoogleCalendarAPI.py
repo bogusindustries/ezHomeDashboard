@@ -1,5 +1,9 @@
 # places next 15 events into lists of today or future
 
+import sys
+print(sys.executable)
+print(sys.version)
+
 from datetime import datetime, timezone
 from tzlocal import get_localzone
 #import pytz

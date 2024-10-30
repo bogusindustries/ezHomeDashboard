@@ -2,9 +2,13 @@
 
 import sys
 
-from PyQt5 import QtWidgets
-from PyQt5 import QtGui
-from PyQt5.QtCore import Qt
+# from PyQt5 import QtWidgets
+# from PyQt5 import QtGui
+# from PyQt5.QtCore import Qt
+
+from PySide6 import QtWidgets
+from PySide6 import QtGui
+from PySide6.QtCore import Qt
 
 import EventWidgets as eventWidgets
 import EZClock as clock
@@ -52,20 +56,25 @@ class EZHomeDashboard(QtWidgets.QMainWindow):
         self.menu = self.menuBar()
 
         self.fileMenu = self.menu.addMenu("File")
-        self.exitAction = QtWidgets.QAction("Close")
+        #self.exitAction = QtWidgets.QAction("Close")
+        self.exitAction = QtGui.QAction("Close")
         self.fileMenu.addAction(self.exitAction)
 
         self.settingsMenu = self.menu.addMenu("Settings")
-        self.weatherSettingsAction = QtWidgets.QAction("Weather Settings")
+        #self.weatherSettingsAction = QtWidgets.QAction("Weather Settings")
+        self.weatherSettingsAction = QtGui.QAction("Weather Settings")
         self.settingsMenu.addAction(self.weatherSettingsAction)
-        self.scheduleSettingsAction = QtWidgets.QAction("Schedule Settings")
+        #self.scheduleSettingsAction = QtWidgets.QAction("Schedule Settings")
+        self.scheduleSettingsAction = QtGui.QAction("Schedule Settings")
         self.settingsMenu.addAction(self.scheduleSettingsAction)
 
         self.windowsMenu = self.menu.addMenu("Windows")
         self.windowsMenu.addAction("Home")
-        self.weatherWindowAction = QtWidgets.QAction("Weather")
+        #self.weatherWindowAction = QtWidgets.QAction("Weather")
+        self.weatherWindowAction = QtGui.QAction("Weather")
         self.windowsMenu.addAction(self.weatherWindowAction)
-        self.scheduleWindowAction = QtWidgets.QAction("Schedule")
+        #self.scheduleWindowAction = QtWidgets.QAction("Schedule")
+        self.scheduleWindowAction = QtGui.QAction("Schedule")
         self.windowsMenu.addAction(self.scheduleWindowAction)
 
     def createPalettes(self):
@@ -90,10 +99,14 @@ class EZHomeDashboard(QtWidgets.QMainWindow):
         self.timeArea.setAutoFillBackground(True)
         self.timeArea.setPalette(self.blackPalette)
         self.timeArea.setStyleSheet(
-            "QWidget{"
+            "QWidget {"
                 "background-color: rgba(0,0,0,1.0);"
                 "border: 2px solid transparent;"
-                "border-radius: 15px;}"
+                "border-radius: 15px;"
+            "}"
+            "QLabel {"
+                "color: white;"
+            "}"
         )
 
         self.timeLabel = QtWidgets.QLabel("HH:MM %p")
@@ -117,10 +130,14 @@ class EZHomeDashboard(QtWidgets.QMainWindow):
         self.weatherArea.setAutoFillBackground(True)
         self.weatherArea.setPalette(self.midGrayPalette)
         self.weatherArea.setStyleSheet(
-            "QWidget{"
+            "QWidget {"
                 "background-color: rgba(40, 40, 40, 1.0);"
                 "border: 2px solid transparent;"
-                "border-radius: 15px;}"
+                "border-radius: 15px;"
+            "}"
+            "QLabel {"
+                "color : white;"
+            "}"
         )
 
         self.weatherSummaryLabel = QtWidgets.QLabel("Summary")
@@ -202,7 +219,11 @@ class EZHomeDashboard(QtWidgets.QMainWindow):
             "#scheduleArea{"
                 "background-color: rgba(70, 70, 70, 1.0);"
                 "border: 2px solid transparent;"
-                "border-radius: 15px;}"
+                "border-radius: 15px;"
+            "}"
+            "QLabel {"
+                "color: white;"
+            "}"
         )
 
         self.todayScheduleLabel = QtWidgets.QLabel("Today's Events")

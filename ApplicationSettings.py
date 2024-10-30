@@ -3,12 +3,18 @@
 
 import sys
 import os
-from PyQt5 import QtWidgets
-from PyQt5 import QtGui
-from PyQt5.QtCore import Qt, QTimer
+# from PyQt5 import QtWidgets
+# from PyQt5 import QtGui
+# from PyQt5.QtCore import Qt, QTimer
+
+from PySide6 import QtWidgets
+from PySide6 import QtGui
+from PySide6.QtCore import Qt, QTimer
+
 import requests
 import json
 import re
+from pathlib import Path
 
 import WeatherAPIRequest as weather
 
@@ -178,6 +184,7 @@ class WeatherSettingsWindow(QtWidgets.QMainWindow):
         self.weatherRequester.city = locationChoice.get("name", "Unknown")
         self.weatherRequester.lat = locationChoice.get("lat")
         self.weatherRequester.lon = locationChoice.get("lon")
+        self.weatherRequester.appID = self.geoLocation.appID
         self.weatherRequester.requestWeather()
         self.dashboard.updateUI()
         #begin timer here that will run weather requests every n minutes
@@ -236,7 +243,7 @@ class GeoLocation:
         #this will contain necessary info to pass to weather (lat lon)
         self.request = requests.get(self.URL).json()
         formattedLocations = [
-            f"{loc.get("name")}, {loc.get("state", "")}, {loc.get("country")}".replace(", ,", ",").strip(",")
+            f"{loc.get('name')}, {loc.get('state', '')}, {loc.get('country')}".replace(", ,", ",").strip(",")
             for loc in self.request
         ]
         
@@ -256,11 +263,14 @@ class GeoLocation:
         #print(self.request)
 
     def checkExistingID(self):
-        macFilePath = "/Users/johnzilka/Documents/JZ/Documents/EZHomeDashboardWeatherID.json"
+        #macFilePath = "/Users/johnzilka/Documents/JZ/Documents/EZHomeDashboardWeatherID.json"
+        #documentsPath = Path.home() / "Documents" / "EZHomeDashboard" / "EZHomeDashboardWeatherID.json"
+        documentsPath = Path.home() / "Documents" / "EZHomeDashboard"
+        filePath = documentsPath / "EZHomeDashboardWeatherID.json"
         print("check for saved file")
-        if os.path.exists(macFilePath):
+        if os.path.exists(filePath):
             print("app id exists. getting it now")
-            with open(macFilePath, "r") as file:
+            with open(filePath, "r") as file:
                 data=json.load(file)
             self.appID=data["appID"]
 
@@ -278,6 +288,13 @@ class SaveID:
             "appID" : appID
         }
 
-        macFilePath = "/Users/johnzilka/Documents/JZ/Documents/EZHomeDashboardWeatherID.json"
-        with open(macFilePath, "w") as file:
+        #macFilePath = "/Users/johnzilka/Documents/JZ/Documents/EZHomeDashboardWeatherID.json"
+        #documentsPath = Path.home() / "Documents" / "EZHomeDashboard" / "EZHomeDashboardWeatherID.json"
+        documentsPath = Path.home() / "Documents" / "EZHomeDashboard"
+        filePath = documentsPath / "EZHomeDashboardWeatherID.json"
+
+        # create directory if it doesn't exist.
+        documentsPath.mkdir(parents=True, exist_ok=True)
+
+        with open(filePath, "w") as file:
             json.dump(self.data, file)

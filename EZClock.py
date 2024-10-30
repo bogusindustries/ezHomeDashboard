@@ -1,10 +1,13 @@
 import sys
 from datetime import datetime
-from PyQt5.QtCore import QTimer, QObject, pyqtSignal
+#from PyQt5.QtCore import QTimer, QObject, pyqtSignal
+from PySide6.QtCore import QTimer, QObject, Signal
 
 class Clock(QObject):
-    timeSignal = pyqtSignal(str)
-    dateSignal = pyqtSignal(str)
+    #timeSignal = pyqtSignal(str)
+    #dateSignal = pyqtSignal(str)
+    timeSignal = Signal(str)
+    dateSignal = Signal(str)
     def __init__(self):
         super().__init__()
         

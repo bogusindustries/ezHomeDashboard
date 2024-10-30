@@ -3,6 +3,7 @@ icons/
 images/
 old/
 venv/
+env/
 CalendarEventReturn_Example.py
 credentials.json
 GeoLocationReturnExample.py

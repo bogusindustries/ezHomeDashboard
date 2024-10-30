@@ -2,6 +2,7 @@ import requests
 import os
 import json
 from datetime import datetime
+from pathlib import Path
 
 class WeatherAPIRequest:
     def __init__(self):
@@ -22,11 +23,14 @@ class WeatherAPIRequest:
         print(self.lon)
 
     def checkExistingID(self):
-        macFilePath = "/Users/johnzilka/Documents/JZ/Documents/EZHomeDashboardWeatherID.json"
+        #macFilePath = "/Users/johnzilka/Documents/JZ/Documents/EZHomeDashboardWeatherID.json"
+        #documentsPath = Path.home() / "Documents" / "EZHomeDashboard" / "EZHomeDashboardWeatherID.json"
+        documentsPath = Path.home() / "Documents" / "EZHomeDashboard"
+        filePath = documentsPath / "EZHomeDashboardWeatherID.json"
         print("check for saved file")
-        if os.path.exists(macFilePath):
+        if os.path.exists(filePath):
             print("app id exists. getting it now")
-            with open(macFilePath, "r") as file:
+            with open(filePath, "r") as file:
                 data=json.load(file)
             self.appID=data["appID"]
 
@@ -39,7 +43,8 @@ class WeatherAPIRequest:
         if not self.Test:
             self.URL = "https://api.openweathermap.org/data/3.0/onecall?lat={}&lon={}&units=imperial&appid={}".format(self.lat, self.lon, self.appID)
             self.request = requests.get(self.URL).json()
-
+        #print(self.appID)
+        #print(self.request)
         self.setCurrentWeatherFields()
 
     def formatTimeStamp(self, timeStamp):
