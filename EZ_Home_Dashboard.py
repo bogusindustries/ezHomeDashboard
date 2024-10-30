@@ -280,6 +280,44 @@ class EZHomeDashboard(QtWidgets.QMainWindow):
         self.todayMoonriseLabel.setText(f"{self.weather.todayMoonrise}")
         self.todayMoonsetLabel.setText(f"{self.weather.todayMoonset}")
 
+    def updateCalendarUI(self):
+        # Clear all widgets in `todayEventsLayout`
+        while self.todayEventsLayout.count() > 0:
+            item = self.todayEventsLayout.takeAt(0)  # Take the item from layout
+            widget = item.widget()
+            if widget is not None:
+                widget.deleteLater()  # Delete the widget to free memory
+
+        # Clear all widgets in `futureEventsLayout`
+        while self.futureEventsLayout.count() > 0:
+            item = self.futureEventsLayout.takeAt(0)
+            widget = item.widget()
+            if widget is not None:
+                widget.deleteLater()
+
+        # Request calendar updates
+        self.calendar.requestCalendar()
+
+        # Add updated widgets to `todayEventsLayout`
+        if self.calendar.todayEvents:
+            for each in self.calendar.todayEvents:
+                event = eventWidgets.VerticalEventWidget(
+                    each["summary"], each["time"], each["date"], each["location"]
+                )
+                self.todayEventsLayout.addWidget(event)
+        else:
+            event = eventWidgets.EmptyVerticalEventWidget()
+            self.todayEventsLayout.addWidget(event)
+
+        # Add updated widgets to `futureEventsLayout`
+        for each in self.calendar.futureEvents:
+            event = eventWidgets.HorizontalEventWidget(
+                each["summary"], each["time"], each["date"], each["location"]
+            )
+            self.futureEventsLayout.addWidget(event)
+
+           
+
     def exitApplication(self):
         self.close()
         

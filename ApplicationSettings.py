@@ -195,6 +195,7 @@ class WeatherSettingsWindow(QtWidgets.QMainWindow):
     def takeWeatherReading(self):
         self.weatherRequester.requestWeather()
         self.dashboard.updateUI()
+        self.dashboard.updateCalendarUI()
         print("weather requested from application settings")
 
 # Window for setting location

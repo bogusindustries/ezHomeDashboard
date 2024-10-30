@@ -2,7 +2,7 @@
 
 from datetime import datetime, timezone
 from tzlocal import get_localzone
-import pytz
+#import pytz
 
 import os.path
 
@@ -17,7 +17,7 @@ class GoogleCalenderAPI:
         self.todayEvents = []
         self.futureEvents = []
         self.localTimezone = get_localzone()
-        self.todaysFuckingDate = datetime.now(self.localTimezone).date()
+        self.todaysDate = datetime.now(self.localTimezone).date()
         self.scopes = ["https://www.googleapis.com/auth/calendar.readonly"]
         self.creds = None
         # The file token.json stores the user's access and refresh tokens, and is
@@ -38,7 +38,13 @@ class GoogleCalenderAPI:
             with open("token.json", "w") as token:
                 token.write(self.creds.to_json())
 
+        self.requestCalendar()
+    
+    # retrieve calendar info
+    def requestCalendar(self):
         try:
+            self.todayEvents = []
+            self.futureEvents = []
             service = build("calendar", "v3", credentials=self.creds)
 
             # Call the Calendar API
@@ -67,16 +73,12 @@ class GoogleCalenderAPI:
                 location = event.get('location', 'No location specified')
                 if "dateTime" in event["start"]:#single event
                     dateTimeString = self.processDateTime(summary, event["start"]["dateTime"], location)
-                    
-                
+                                
                 elif "date" in event["start"]:#recurring events
                     dateString = self.processDate(summary, event["start"]["date"], location)
 
         except HttpError as error:
             print(f"An error occurred: {error}")
-
-        print(f"Today's events: {self.todayEvents}")
-        print(f"Future Events: {self.futureEvents}")
 
     def processDateTime(self, summary, dateTime, location):
         event_time_utc = datetime.fromisoformat(dateTime)
@@ -91,7 +93,7 @@ class GoogleCalenderAPI:
             "location" : location
         }
         
-        if checkDate == self.todaysFuckingDate:
+        if checkDate == self.todaysDate:
             self.todayEvents.append(tempDict)
         else:
             self.futureEvents.append(tempDict)
@@ -105,7 +107,7 @@ class GoogleCalenderAPI:
             "location" : location
         }
 
-        if checkDate == self.todaysFuckingDate:
+        if checkDate == self.todaysDate:
             self.todayEvents.append(tempDict)
         else:
             self.futureEvents.append(tempDict)
