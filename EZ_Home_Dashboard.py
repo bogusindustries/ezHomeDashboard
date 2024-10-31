@@ -128,6 +128,7 @@ class EZHomeDashboard(QtWidgets.QMainWindow):
     def createWeatherSection(self):
         self.weatherArea = QtWidgets.QWidget()
         self.weatherArea.setAutoFillBackground(True)
+        self.weatherArea.setMaximumHeight(300)
         self.weatherArea.setStyleSheet(
             "QWidget {"
                 "background-color: rgba(40, 40, 40, 1.0);"
@@ -210,7 +211,7 @@ class EZHomeDashboard(QtWidgets.QMainWindow):
     def createAlertSection(self):
         self.alertArea = QtWidgets.QWidget()
         self.alertArea.setAutoFillBackground(True)
-        self.alertArea.setMinimumHeight(100)
+        self.alertArea.setMaximumHeight(150)
         self.alertArea.setStyleSheet(
             "QWidget {"
                 "background-color: rgba(40, 0, 0, 1.0);"
@@ -242,7 +243,7 @@ class EZHomeDashboard(QtWidgets.QMainWindow):
     def createRainSection(self):
         self.rainGraphArea = QtWidgets.QWidget()
         self.rainGraphArea.setAutoFillBackground(True)
-        self.rainGraphArea.setMinimumHeight(150)
+        self.rainGraphArea.setMaximumHeight(150)
         self.rainGraphArea.setStyleSheet(
             "QWidget {"
                 "background-color: rgba(0, 0, 0, 1.0);"
