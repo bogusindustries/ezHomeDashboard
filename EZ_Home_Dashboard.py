@@ -6,10 +6,10 @@ from PyQt5 import QtWidgets
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt
 
-import eventWidgets_05 as eventWidgets
-import clock_v02 as clock
-import ApplicationSettings_v02 as settings
-
+import EventWidgets as eventWidgets
+import EZClock as clock
+import ApplicationSettings as settings
+import GoogleCalendarAPI as calendar
 
 class EZHomeDashboard(QtWidgets.QMainWindow):
     def __init__(self):
@@ -24,6 +24,8 @@ class EZHomeDashboard(QtWidgets.QMainWindow):
         self.clock = clock.Clock()
         self.weatherSettingsWindow = settings.WeatherSettingsWindow(self)
         self.weather = self.weatherSettingsWindow.weatherRequester
+        self.calendar = calendar.GoogleCalenderAPI()
+        
 
         self.createMenus()
         self.createPalettes()
@@ -205,33 +207,28 @@ class EZHomeDashboard(QtWidgets.QMainWindow):
 
         self.todayScheduleLabel = QtWidgets.QLabel("Today's Events")
         self.todayScheduleLabel.setFixedHeight(30)
-        #self.todayEvent1 = eventWidgets.VerticalEventWidget(rgb=[23,134,234])
-        self.todayEvent1 = eventWidgets.VerticalEventWidget()
-        self.todayEvent2 = eventWidgets.VerticalEventWidget()
-        self.todayEvent3 = eventWidgets.VerticalEventWidget()
-        self.todayEvent4 = eventWidgets.VerticalEventWidget()
-        self.todayEvent5 = eventWidgets.VerticalEventWidget()
 
-        self.futureScheduleLabel = QtWidgets.QLabel("Upcoming Events")
-        self.futureEvent1 = eventWidgets.HorizontalEventWidget()
-        self.futureEvent2 = eventWidgets.HorizontalEventWidget()
-        self.futureEvent3 = eventWidgets.HorizontalEventWidget()
-        self.futureEvent4 = eventWidgets.HorizontalEventWidget()
-        self.futureEvent5 = eventWidgets.HorizontalEventWidget()
-        self.futureEvent6 = eventWidgets.HorizontalEventWidget()
-        self.futureEvent7 = eventWidgets.HorizontalEventWidget()
-        self.futureEvent8 = eventWidgets.HorizontalEventWidget()
-        self.futureEvent9 = eventWidgets.HorizontalEventWidget()
-        self.futureEvent10 = eventWidgets.HorizontalEventWidget()
-        
         self.todayEventsLayout = QtWidgets.QHBoxLayout()
         self.todayEventsLayout.setContentsMargins(0, 0, 0, 0)
         self.todayEventsLayout.setSpacing(0)
-        self.todayEventsLayout.addWidget(self.todayEvent1)
-        self.todayEventsLayout.addWidget(self.todayEvent2)
-        self.todayEventsLayout.addWidget(self.todayEvent3)
-        self.todayEventsLayout.addWidget(self.todayEvent4)
-        self.todayEventsLayout.addWidget(self.todayEvent5)
+
+        if self.calendar.todayEvents:
+            for each in self.calendar.todayEvents:
+                event = eventWidgets.VerticalEventWidget(each["summary"], each["time"], each["date"], each["location"])
+                self.todayEventsLayout.addWidget(event)
+        else:
+            event = eventWidgets.EmptyVerticalEventWidget()
+            self.todayEventsLayout.addWidget(event)
+
+        self.futureScheduleLabel = QtWidgets.QLabel("Upcoming Events")
+        
+        self.futureEventsLayout = QtWidgets.QVBoxLayout()
+        self.futureEventsLayout.setContentsMargins(0,0,0,0)
+        self.futureEventsLayout.setSpacing(0)
+
+        for each in self.calendar.futureEvents:
+            event = eventWidgets.HorizontalEventWidget(each["summary"], each["time"], each["date"], each["location"])
+            self.futureEventsLayout.addWidget(event)
 
         # Holds today schedule title and events
         self.todayScheduleLayout = QtWidgets.QVBoxLayout()
@@ -239,20 +236,6 @@ class EZHomeDashboard(QtWidgets.QMainWindow):
         self.todayScheduleLayout.setSpacing(10)
         self.todayScheduleLayout.addWidget(self.todayScheduleLabel)
         self.todayScheduleLayout.addLayout(self.todayEventsLayout)
-
-        self.futureEventsLayout = QtWidgets.QVBoxLayout()
-        self.futureEventsLayout.setContentsMargins(0,0,0,0)
-        self.futureEventsLayout.setSpacing(0)
-        self.futureEventsLayout.addWidget(self.futureEvent1)
-        self.futureEventsLayout.addWidget(self.futureEvent2)
-        self.futureEventsLayout.addWidget(self.futureEvent3)
-        self.futureEventsLayout.addWidget(self.futureEvent4)
-        self.futureEventsLayout.addWidget(self.futureEvent5)
-        self.futureEventsLayout.addWidget(self.futureEvent6)
-        self.futureEventsLayout.addWidget(self.futureEvent7)
-        self.futureEventsLayout.addWidget(self.futureEvent8)
-        self.futureEventsLayout.addWidget(self.futureEvent9)
-        self.futureEventsLayout.addWidget(self.futureEvent10)
 
         # Holds future schedule title and events
         self.futureScheduleLayout = QtWidgets.QVBoxLayout()
@@ -262,8 +245,7 @@ class EZHomeDashboard(QtWidgets.QMainWindow):
         self.allScheduleLayout = QtWidgets.QHBoxLayout()
         self.allScheduleLayout.addLayout(self.todayScheduleLayout)
         self.allScheduleLayout.addLayout(self.futureScheduleLayout)
-
-        
+ 
         self.scheduleArea.setLayout(self.allScheduleLayout)
 
     def createBottomsection(self):
@@ -297,6 +279,44 @@ class EZHomeDashboard(QtWidgets.QMainWindow):
         self.todaySunsetLabel.setText(f"{self.weather.todaySunset}")
         self.todayMoonriseLabel.setText(f"{self.weather.todayMoonrise}")
         self.todayMoonsetLabel.setText(f"{self.weather.todayMoonset}")
+
+    def updateCalendarUI(self):
+        # Clear all widgets in `todayEventsLayout`
+        while self.todayEventsLayout.count() > 0:
+            item = self.todayEventsLayout.takeAt(0)  # Take the item from layout
+            widget = item.widget()
+            if widget is not None:
+                widget.deleteLater()  # Delete the widget to free memory
+
+        # Clear all widgets in `futureEventsLayout`
+        while self.futureEventsLayout.count() > 0:
+            item = self.futureEventsLayout.takeAt(0)
+            widget = item.widget()
+            if widget is not None:
+                widget.deleteLater()
+
+        # Request calendar updates
+        self.calendar.requestCalendar()
+
+        # Add updated widgets to `todayEventsLayout`
+        if self.calendar.todayEvents:
+            for each in self.calendar.todayEvents:
+                event = eventWidgets.VerticalEventWidget(
+                    each["summary"], each["time"], each["date"], each["location"]
+                )
+                self.todayEventsLayout.addWidget(event)
+        else:
+            event = eventWidgets.EmptyVerticalEventWidget()
+            self.todayEventsLayout.addWidget(event)
+
+        # Add updated widgets to `futureEventsLayout`
+        for each in self.calendar.futureEvents:
+            event = eventWidgets.HorizontalEventWidget(
+                each["summary"], each["time"], each["date"], each["location"]
+            )
+            self.futureEventsLayout.addWidget(event)
+
+           
 
     def exitApplication(self):
         self.close()

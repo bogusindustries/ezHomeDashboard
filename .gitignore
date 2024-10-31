@@ -1,0 +1,13 @@
+__pycache__/
+icons/
+images/
+old/
+venv/
+CalendarEventReturn_Example.py
+credentials.json
+GeoLocationReturnExample.py
+GoogleCalendarAPI_Example.py
+token.json
+WeatherAPIReturn_Example.py
+WeatherRequester_Example.py
+WeatherStationUI_24Example.py
