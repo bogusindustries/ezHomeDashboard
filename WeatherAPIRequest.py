@@ -105,6 +105,22 @@ class WeatherAPIRequest:
         self.todayMoonset = self.formatTimeStamp(self.request["daily"][0]["moonset"])[1]
         self.processMinutely()
         self.processHourly()
+        #self.weatherAlert = self.request.get("alerts", "")
+        if "alerts" in self.request:
+            self.weatherAlert = self.request["alerts"][0]["event"]
+            self.weatherAlertTag = self.request["alerts"][0]["tags"][0]
+            startDay, startTime = self.formatTimeStamp(self.request["alerts"][0]["start"])[0],self.formatTimeStamp(self.request["alerts"][0]["start"])[3]
+            self.weatherAlertStart = f"{startDay} {startTime}"
+            endDay, endTime = self.formatTimeStamp(self.request["alerts"][0]["end"])[0],self.formatTimeStamp(self.request["alerts"][0]["end"])[3]
+            self.weatherAlertEnd = f"{endDay} {endTime}"
+            #print(f"alert start: {self.weatherAlertStart}")
+        else:
+            self.weatherAlert = "None"
+            self.weatherAlertTag = ""
+            self.weatherAlertStart = ""
+            self.weatherAlertEnd = ""
+
+
 
     def processMinutely(self):
         self.precipProbArray = []

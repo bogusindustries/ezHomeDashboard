@@ -42,6 +42,7 @@ class EZHomeDashboard(QtWidgets.QMainWindow):
         self.createDateTimeSection()
         self.createWeatherSection()
         self.createTopSection()
+        self.createAlertSection()
         self.createRainSection()
         self.createMiddleSection()
         self.createScheduleSection()
@@ -217,6 +218,39 @@ class EZHomeDashboard(QtWidgets.QMainWindow):
         self.homeTopSectionLayout.addWidget(self.timeArea)
         self.homeTopSectionLayout.addWidget(self.weatherArea)
 
+    def createAlertSection(self):
+        self.alertArea = QtWidgets.QWidget()
+        self.alertArea.setAutoFillBackground(True)
+        self.alertArea.setMinimumHeight(100)
+        self.alertArea.setStyleSheet(
+            "QWidget {"
+                "background-color: rgba(40, 0, 0, 1.0);"
+                "border: 2px solid transparent;"
+                "border-radius: 15px;"
+            "}"
+            "QLabel {"
+                "color: white;"
+            "}"
+        )
+        self.alertLabel = QtWidgets.QLabel("Weather Alert")
+        self.alertLabel.setFont(QtGui.QFont(self.defaultFont, 12))
+        self.weatherAlertEvent = QtWidgets.QLabel("Event")
+        self.weatherAlertTag = QtWidgets.QLabel("Tag")
+        self.weatherAlertStart = QtWidgets.QLabel("Start")
+        self.weatherAlertEnd = QtWidgets.QLabel("End")
+
+        self.weatherAlertLayout = QtWidgets.QVBoxLayout()
+        self.weatherAlertLayout.setContentsMargins(10,10,10,10)
+        self.weatherAlertLayout.setSpacing(0)
+        self.weatherAlertLayout.addWidget(self.alertLabel)
+        self.weatherAlertLayout.addWidget(self.weatherAlertEvent)
+        self.weatherAlertLayout.addWidget(self.weatherAlertTag)
+        self.weatherAlertLayout.addWidget(self.weatherAlertStart)
+        self.weatherAlertLayout.addWidget(self.weatherAlertEnd)
+
+        self.alertArea.setLayout(self.weatherAlertLayout)
+
+    
     def createRainSection(self):
         self.rainGraphArea = QtWidgets.QWidget()
         self.rainGraphArea.setAutoFillBackground(True)
@@ -260,6 +294,7 @@ class EZHomeDashboard(QtWidgets.QMainWindow):
 
     def createMiddleSection(self):
         self.homeMiddleSectionLayout = QtWidgets.QHBoxLayout()
+        self.homeMiddleSectionLayout.addWidget(self.alertArea)
         self.homeMiddleSectionLayout.addWidget(self.rainGraphArea)
 
     def createScheduleSection(self):
@@ -366,6 +401,12 @@ class EZHomeDashboard(QtWidgets.QMainWindow):
         #currentMoonIcon = self.weather.currentMoonIcon
         moonPixmap = QtGui.QPixmap(self.weather.currentMoonIcon[0])
         self.currentMoonImageWidget.setPixmap(moonPixmap)
+
+        # Weather alerts
+        self.weatherAlertEvent.setText(f"{self.weather.weatherAlert}")
+        self.weatherAlertTag.setText(f"{self.weather.weatherAlertTag}")
+        self.weatherAlertStart.setText(f"{self.weather.weatherAlertStart}")
+        self.weatherAlertEnd.setText(f"{self.weather.weatherAlertEnd}")
 
     def updateCalendarUI(self):
         # Clear all widgets in `todayEventsLayout`
