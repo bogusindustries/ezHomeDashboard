@@ -11,3 +11,4 @@ token.json
 WeatherAPIReturn_Example.py
 WeatherRequester_Example.py
 WeatherStationUI_24Example.py
+.DS_Store
