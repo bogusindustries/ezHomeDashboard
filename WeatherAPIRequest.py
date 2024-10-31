@@ -107,8 +107,7 @@ class WeatherAPIRequest:
         self.processHourly()
         #self.weatherAlert = self.request.get("alerts", "")
         if "alerts" in self.request:
-            #self.weatherAlert = self.request["alerts"][0]["event"]
-            self.weatherAlert = "None"
+            self.weatherAlert = self.request["alerts"][0]["event"]
             self.weatherAlertTag = self.request["alerts"][0]["tags"][0]
             startDay, startTime = self.formatTimeStamp(self.request["alerts"][0]["start"])[0],self.formatTimeStamp(self.request["alerts"][0]["start"])[3]
             self.weatherAlertStart = f"{startDay} {startTime}"
