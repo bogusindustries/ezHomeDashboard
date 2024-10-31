@@ -2,10 +2,6 @@
 
 import sys
 
-# from PyQt5 import QtWidgets
-# from PyQt5 import QtGui
-# from PyQt5.QtCore import Qt
-
 from PySide6 import QtWidgets
 from PySide6 import QtGui
 from PySide6.QtCore import Qt
@@ -65,24 +61,19 @@ class EZHomeDashboard(QtWidgets.QMainWindow):
         self.menu = self.menuBar()
 
         self.fileMenu = self.menu.addMenu("File")
-        #self.exitAction = QtWidgets.QAction("Close")
         self.exitAction = QtGui.QAction("Close")
         self.fileMenu.addAction(self.exitAction)
 
         self.settingsMenu = self.menu.addMenu("Settings")
-        #self.weatherSettingsAction = QtWidgets.QAction("Weather Settings")
         self.weatherSettingsAction = QtGui.QAction("Weather Settings")
         self.settingsMenu.addAction(self.weatherSettingsAction)
-        #self.scheduleSettingsAction = QtWidgets.QAction("Schedule Settings")
         self.scheduleSettingsAction = QtGui.QAction("Schedule Settings")
         self.settingsMenu.addAction(self.scheduleSettingsAction)
 
         self.windowsMenu = self.menu.addMenu("Windows")
         self.windowsMenu.addAction("Home")
-        #self.weatherWindowAction = QtWidgets.QAction("Weather")
         self.weatherWindowAction = QtGui.QAction("Weather")
         self.windowsMenu.addAction(self.weatherWindowAction)
-        #self.scheduleWindowAction = QtWidgets.QAction("Schedule")
         self.scheduleWindowAction = QtGui.QAction("Schedule")
         self.windowsMenu.addAction(self.scheduleWindowAction)
 
@@ -106,7 +97,6 @@ class EZHomeDashboard(QtWidgets.QMainWindow):
     def createDateTimeSection(self):
         self.timeArea = QtWidgets.QWidget()
         self.timeArea.setAutoFillBackground(True)
-        #self.timeArea.setPalette(self.blackPalette)
         self.timeArea.setMaximumSize(300, 300)
         self.timeArea.setStyleSheet(
             "QWidget {"
@@ -138,7 +128,6 @@ class EZHomeDashboard(QtWidgets.QMainWindow):
     def createWeatherSection(self):
         self.weatherArea = QtWidgets.QWidget()
         self.weatherArea.setAutoFillBackground(True)
-        #self.weatherArea.setPalette(self.midGrayPalette)
         self.weatherArea.setStyleSheet(
             "QWidget {"
                 "background-color: rgba(40, 40, 40, 1.0);"
@@ -250,7 +239,6 @@ class EZHomeDashboard(QtWidgets.QMainWindow):
 
         self.alertArea.setLayout(self.weatherAlertLayout)
 
-    
     def createRainSection(self):
         self.rainGraphArea = QtWidgets.QWidget()
         self.rainGraphArea.setAutoFillBackground(True)
@@ -281,7 +269,6 @@ class EZHomeDashboard(QtWidgets.QMainWindow):
         self.precipProbHourlyArray = np.random.randint(0,100, 48)
         self.precipBarGraphHourlyPlot = pg.BarGraphItem(x=self.xAxisArrayHourlyPrecip, height=self.precipProbHourlyArray, width=0.6, brush='b')
         self.precipProbHourlyGraph.addItem(self.precipBarGraphHourlyPlot)
-
 
         self.rainGraphLayout = QtWidgets.QVBoxLayout()
         self.rainGraphLayout.setContentsMargins(10,10,10,10)
@@ -449,6 +436,8 @@ class EZHomeDashboard(QtWidgets.QMainWindow):
         
 def main():
     app = QtWidgets.QApplication(sys.argv)
+    # Use system appearance settings
+    app.setStyle("Fusion")
     EZHomeDashboardInstance = EZHomeDashboard()
     EZHomeDashboardInstance.show()
     sys.exit(app.exec())
