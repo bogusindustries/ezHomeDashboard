@@ -10,6 +10,9 @@ from PySide6 import QtWidgets
 from PySide6 import QtGui
 from PySide6.QtCore import Qt
 
+import pyqtgraph as pg
+import numpy as np
+
 import EventWidgets as eventWidgets
 import EZClock as clock
 import ApplicationSettings as settings
@@ -25,6 +28,9 @@ class EZHomeDashboard(QtWidgets.QMainWindow):
         self.defaultFont = "Avenir"
         self.secondaryFont = "Roboto"
 
+        self.xAxisArrayPrecip = np.arange(60)
+        self.xAxisArrayHourlyPrecip = np.arange(48)
+
         self.clock = clock.Clock()
         self.weatherSettingsWindow = settings.WeatherSettingsWindow(self)
         self.weather = self.weatherSettingsWindow.weatherRequester
@@ -36,6 +42,8 @@ class EZHomeDashboard(QtWidgets.QMainWindow):
         self.createDateTimeSection()
         self.createWeatherSection()
         self.createTopSection()
+        self.createRainSection()
+        self.createMiddleSection()
         self.createScheduleSection()
         self.createBottomsection()
         self.createMainLayouts()
@@ -97,7 +105,8 @@ class EZHomeDashboard(QtWidgets.QMainWindow):
     def createDateTimeSection(self):
         self.timeArea = QtWidgets.QWidget()
         self.timeArea.setAutoFillBackground(True)
-        self.timeArea.setPalette(self.blackPalette)
+        #self.timeArea.setPalette(self.blackPalette)
+        self.timeArea.setMaximumSize(300, 300)
         self.timeArea.setStyleSheet(
             "QWidget {"
                 "background-color: rgba(0,0,0,1.0);"
@@ -118,7 +127,7 @@ class EZHomeDashboard(QtWidgets.QMainWindow):
         self.dateLabel.setAlignment(Qt.AlignCenter)
 
         self.timeAreaLayout = QtWidgets.QVBoxLayout()
-        self.timeAreaLayout.setContentsMargins(10,100,10,100)
+        self.timeAreaLayout.setContentsMargins(10,80,10,40)
         self.timeAreaLayout.setSpacing(0)
         self.timeAreaLayout.addWidget(self.timeLabel)
         self.timeAreaLayout.addWidget(self.dateLabel)
@@ -128,7 +137,7 @@ class EZHomeDashboard(QtWidgets.QMainWindow):
     def createWeatherSection(self):
         self.weatherArea = QtWidgets.QWidget()
         self.weatherArea.setAutoFillBackground(True)
-        self.weatherArea.setPalette(self.midGrayPalette)
+        #self.weatherArea.setPalette(self.midGrayPalette)
         self.weatherArea.setStyleSheet(
             "QWidget {"
                 "background-color: rgba(40, 40, 40, 1.0);"
@@ -208,6 +217,51 @@ class EZHomeDashboard(QtWidgets.QMainWindow):
         self.homeTopSectionLayout.addWidget(self.timeArea)
         self.homeTopSectionLayout.addWidget(self.weatherArea)
 
+    def createRainSection(self):
+        self.rainGraphArea = QtWidgets.QWidget()
+        self.rainGraphArea.setAutoFillBackground(True)
+        self.rainGraphArea.setMinimumHeight(150)
+        self.rainGraphArea.setStyleSheet(
+            "QWidget {"
+                "background-color: rgba(0, 0, 0, 1.0);"
+                "border: 2px solid transparent;"
+                "border-radius: 15px;"
+            "}"
+            "QLabel {"
+                "color: white;"
+            "}"
+        )
+
+        self.rainGraphLabel = QtWidgets.QLabel("Hour Rain Outlook")
+        self.rainGraphLabel.setFont(QtGui.QFont(self.defaultFont, 12))
+        self.rainGraphLabel.setAlignment(Qt.AlignCenter)
+
+        self.precipProbGraph = pg.PlotWidget()
+        self.precipProbGraph.getPlotItem().getAxis("left").setLabel("1 hr")
+        self.precipProbArray = np.random.randint(0, 100, 60)
+        self.precipBarGraphPlot = pg.BarGraphItem(x=self.xAxisArrayPrecip, height=self.precipProbArray, width=0.6, brush='b')
+        self.precipProbGraph.addItem(self.precipBarGraphPlot)
+
+        self.precipProbHourlyGraph = pg.PlotWidget()
+        self.precipProbHourlyGraph.getPlotItem().getAxis("left").setLabel("48 hrs")
+        self.precipProbHourlyArray = np.random.randint(0,100, 48)
+        self.precipBarGraphHourlyPlot = pg.BarGraphItem(x=self.xAxisArrayHourlyPrecip, height=self.precipProbHourlyArray, width=0.6, brush='b')
+        self.precipProbHourlyGraph.addItem(self.precipBarGraphHourlyPlot)
+
+
+        self.rainGraphLayout = QtWidgets.QVBoxLayout()
+        self.rainGraphLayout.setContentsMargins(10,10,10,10)
+        self.rainGraphLayout.setSpacing(0)
+        #self.rainGraphLayout.addWidget(self.rainGraphLabel)
+        self.rainGraphLayout.addWidget(self.precipProbGraph)
+        self.rainGraphLayout.addWidget(self.precipProbHourlyGraph)
+
+        self.rainGraphArea.setLayout(self.rainGraphLayout)
+
+    def createMiddleSection(self):
+        self.homeMiddleSectionLayout = QtWidgets.QHBoxLayout()
+        self.homeMiddleSectionLayout.addWidget(self.rainGraphArea)
+
     def createScheduleSection(self):
         self.scheduleArea = QtWidgets.QWidget()
         self.scheduleArea.setObjectName("scheduleArea")
@@ -276,6 +330,7 @@ class EZHomeDashboard(QtWidgets.QMainWindow):
     def createMainLayouts(self):
         self.mainLayout = QtWidgets.QVBoxLayout()
         self.mainLayout.addLayout(self.homeTopSectionLayout)
+        self.mainLayout.addLayout(self.homeMiddleSectionLayout)
         self.mainLayout.addLayout(self.homeBottomSectionLayout)
 
         centralWidget = QtWidgets.QWidget()
@@ -296,10 +351,21 @@ class EZHomeDashboard(QtWidgets.QMainWindow):
         self.expectedLowLabel.setText(f"{self.weather.expectedLow} °F")
         self.precipProbLabel.setText(f"{self.weather.precipProb} %")
         self.currentWeatherDescriptionLabel.setText(f"{self.weather.todayDescription}")
+        self.currentMoonPhaseLabel.setText(self.weather.currentMoonIcon[1])
         self.todaySunriseLabel.setText(f"{self.weather.todaySunrise}")
         self.todaySunsetLabel.setText(f"{self.weather.todaySunset}")
         self.todayMoonriseLabel.setText(f"{self.weather.todayMoonrise}")
         self.todayMoonsetLabel.setText(f"{self.weather.todayMoonset}")
+        self.precipBarGraphPlot.setOpts(height=self.weather.precipProbArray)
+        self.precipBarGraphHourlyPlot.setOpts(height=self.weather.precipProbHourlyArray)
+        
+        #currentWeatherIcon = self.weather.currentWeatherIcon
+        weatherPixmap = QtGui.QPixmap(self.weather.currentWeatherIcon)
+        self.currentWeatherImageWidget.setPixmap(weatherPixmap)
+
+        #currentMoonIcon = self.weather.currentMoonIcon
+        moonPixmap = QtGui.QPixmap(self.weather.currentMoonIcon[0])
+        self.currentMoonImageWidget.setPixmap(moonPixmap)
 
     def updateCalendarUI(self):
         # Clear all widgets in `todayEventsLayout`
@@ -336,8 +402,6 @@ class EZHomeDashboard(QtWidgets.QMainWindow):
                 each["summary"], each["time"], each["date"], each["location"]
             )
             self.futureEventsLayout.addWidget(event)
-
-           
 
     def exitApplication(self):
         self.close()

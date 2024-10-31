@@ -1,9 +1,5 @@
 # places next 15 events into lists of today or future
 
-import sys
-print(sys.executable)
-print(sys.version)
-
 from datetime import datetime, timezone
 from tzlocal import get_localzone
 #import pytz
@@ -60,7 +56,7 @@ class GoogleCalenderAPI:
                 .list(
                     calendarId="primary",
                     timeMin=rfc3339_timestamp,
-                    maxResults=8,
+                    maxResults=6,
                     singleEvents=True,
                     orderBy="startTime",
                 )
@@ -115,7 +111,3 @@ class GoogleCalenderAPI:
             self.todayEvents.append(tempDict)
         else:
             self.futureEvents.append(tempDict)
-
-# calender = GoogleCalenderAPI()
-# print(calender.todayEvents)
-# print(calender.futureEvents)

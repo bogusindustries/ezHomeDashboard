@@ -95,9 +95,82 @@ class WeatherAPIRequest:
         self.currentTemp = self.request["current"]["temp"]
         self.expectedHigh = self.request["daily"][0]["temp"]["max"]
         self.expectedLow = self.request["daily"][0]["temp"]["min"]
-        self.precipProb = self.request["daily"][0]["pop"]
+        self.precipProb = self.processPrecipPercent(self.request["daily"][0]["pop"])
         self.todayDescription = self.request["daily"][0]["weather"][0]["description"]
+        self.currentWeatherIcon = self.processCurrentIcon(self.request["daily"][0]["weather"][0]["icon"])
+        self.currentMoonIcon = self.processMoonPhase(self.request["daily"][0]["moon_phase"])
         self.todaySunrise = self.formatTimeStamp(self.request["current"]["sunrise"])[1]
         self.todaySunset = self.formatTimeStamp(self.request["current"]["sunset"])[1]
         self.todayMoonrise = self.formatTimeStamp(self.request["daily"][0]["moonrise"])[1]
         self.todayMoonset = self.formatTimeStamp(self.request["daily"][0]["moonset"])[1]
+        self.processMinutely()
+        self.processHourly()
+
+    def processMinutely(self):
+        self.precipProbArray = []
+        for i in self.request["minutely"]:
+            #processedPercent = self.processPrecipPercent(i["precipitation"])
+            mm = i["precipitation"]
+            precip = (f"{mm / 25.4:.2f}")
+            self.precipProbArray.append(float(precip))
+
+    def processHourly(self):
+        self.precipProbHourlyArray = []
+        for i in self.request["hourly"]:
+            processedPercent = self.processPrecipPercent(i["pop"])
+            self.precipProbHourlyArray.append(float(processedPercent))
+
+
+    def processPrecipPercent(self, pop):
+        percent = (f"{pop * 100:.1f}")
+        return percent
+
+    
+    def processCurrentIcon(self, image):
+        imageName = image
+        iconPath = f"icons/WeatherIcons/{imageName}.png"
+        return iconPath
+    
+    # takes weather request return moon_phase (0.00-1) and returns a file path for icon
+    def processMoonPhase(self, moonPhase):
+        if moonPhase == 0:
+            iconPath = "icons/weatherIcons/newMoon.png"
+            phaseName = "New Moon"
+        
+        elif moonPhase > 0 and moonPhase <= 0.24:
+            iconPath = "icons/weatherIcons/waxingCrescent.png"
+            phaseName = "Waxing Crescent"
+        
+        elif moonPhase == 0.25:
+            iconPath = "icons/weatherIcons/firstQuarterMoon.png"
+            phaseName = "First Quarter"
+        
+        elif moonPhase > 0.25 and moonPhase <= 0.49:
+            iconPath = "icons/weatherIcons/waxingGibbous.png"
+            phaseName = "Waxing Gibbous"
+        
+        elif moonPhase == 0.5:
+            iconPath = "icons/weatherIcons/fullMoon.png"
+            phaseName = "Full Moon"
+        
+        elif moonPhase > 0.5 and moonPhase <= 0.74:
+            iconPath = "icons/weatherIcons/waningGibbous.png"
+            phaseName = "Waning Gibbous"
+        
+        elif moonPhase == 0.75:
+            iconPath = "icons/weatherIcons/thirQuarterMoon.png"
+            phaseName = "Third Quarter"
+        
+        elif moonPhase > 0.75 and moonPhase < 1:
+            iconPath = "icons/weatherIcons/waningCrescent.png"
+            phaseName = "Waning Crescent"
+
+        elif moonPhase == 1:
+            iconPath = "icons/weatherIcons/fullMoon.png"
+            phaseName = "Full Moon"
+        
+        else:
+            iconPath = "icons/weatherIcons/fullMoon.png"
+            phaseName = "Unknown Phase"
+
+        return iconPath, phaseName

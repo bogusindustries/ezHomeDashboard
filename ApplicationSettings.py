@@ -191,7 +191,7 @@ class WeatherSettingsWindow(QtWidgets.QMainWindow):
         self.startWeatherTimer()
 
     def startWeatherTimer(self):
-        self.weatherTimer.setInterval(900000)#15 minutes = 900000
+        self.weatherTimer.setInterval(120000)#15 minutes = 900000
         self.weatherTimer.timeout.connect(self.onQuarterHour)
         self.weatherTimer.start()
 
