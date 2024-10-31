@@ -403,10 +403,14 @@ class EZHomeDashboard(QtWidgets.QMainWindow):
         self.currentMoonImageWidget.setPixmap(moonPixmap)
 
         # Weather alerts
-        self.weatherAlertEvent.setText(f"{self.weather.weatherAlert}")
-        self.weatherAlertTag.setText(f"{self.weather.weatherAlertTag}")
-        self.weatherAlertStart.setText(f"{self.weather.weatherAlertStart}")
-        self.weatherAlertEnd.setText(f"{self.weather.weatherAlertEnd}")
+        if self.weather.weatherAlert == "None":
+            self.alertArea.setVisible(False)
+        else:
+            self.alertArea.setVisible(True)
+            self.weatherAlertEvent.setText(f"{self.weather.weatherAlert}")
+            self.weatherAlertTag.setText(f"{self.weather.weatherAlertTag}")
+            self.weatherAlertStart.setText(f"{self.weather.weatherAlertStart}")
+            self.weatherAlertEnd.setText(f"{self.weather.weatherAlertEnd}")
 
     def updateCalendarUI(self):
         # Clear all widgets in `todayEventsLayout`
