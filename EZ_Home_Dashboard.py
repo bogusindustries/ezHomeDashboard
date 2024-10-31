@@ -120,7 +120,7 @@ class EZHomeDashboard(QtWidgets.QMainWindow):
         )
 
         self.timeLabel = QtWidgets.QLabel("HH:MM %p")
-        self.timeLabel.setFont(QtGui.QFont(self.defaultFont, 45))
+        self.timeLabel.setFont(QtGui.QFont(self.defaultFont, 35))
         self.timeLabel.setAlignment(Qt.AlignCenter)
 
         self.dateLabel = QtWidgets.QLabel("Day, Month ##")
@@ -286,7 +286,6 @@ class EZHomeDashboard(QtWidgets.QMainWindow):
         self.rainGraphLayout = QtWidgets.QVBoxLayout()
         self.rainGraphLayout.setContentsMargins(10,10,10,10)
         self.rainGraphLayout.setSpacing(0)
-        #self.rainGraphLayout.addWidget(self.rainGraphLabel)
         self.rainGraphLayout.addWidget(self.precipProbGraph)
         self.rainGraphLayout.addWidget(self.precipProbHourlyGraph)
 
@@ -301,9 +300,6 @@ class EZHomeDashboard(QtWidgets.QMainWindow):
         self.scheduleArea = QtWidgets.QWidget()
         self.scheduleArea.setObjectName("scheduleArea")
         self.scheduleArea.setContentsMargins(10, 10, 10, 10)
-        #self.scheduleArea.setAutoFillBackground(True)
-
-        #self.scheduleArea.setPalette(self.magentaPalette)
         self.scheduleArea.setStyleSheet(
             "#scheduleArea{"
                 "background-color: rgba(70, 70, 70, 1.0);"

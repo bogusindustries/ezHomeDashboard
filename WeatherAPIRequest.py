@@ -124,11 +124,12 @@ class WeatherAPIRequest:
 
     def processMinutely(self):
         self.precipProbArray = []
-        for i in self.request["minutely"]:
-            #processedPercent = self.processPrecipPercent(i["precipitation"])
-            mm = i["precipitation"]
-            precip = (f"{mm / 25.4:.2f}")
-            self.precipProbArray.append(float(precip))
+        if "minutely" in self.request:
+            for i in self.request["minutely"]:
+                #processedPercent = self.processPrecipPercent(i["precipitation"])
+                mm = i["precipitation"]
+                precip = (f"{mm / 25.4:.2f}")
+                self.precipProbArray.append(float(precip))
 
     def processHourly(self):
         self.precipProbHourlyArray = []
